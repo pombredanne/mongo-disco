@@ -17,10 +17,10 @@ For instructions to setup disco clusters, please refer to the the guide(http://d
 1.  Check out the latest source code in github
 
 ```bash
-   $ git clone https://github.com/10genNYUITP/MongoDisco MongoDisco
+   $ git clone https://github.com/mongo/mongo-disco.git mongo-disco
 ```
 
-2.  Go to MongoDisco folder, and run the setup.py file to install MongoDisco package
+2.  Go to mongo-disco folder, and run the setup.py file to install MongoDisco package
 
 ```bash    
     $ python setup.py install 
