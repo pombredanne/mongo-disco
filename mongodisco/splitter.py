@@ -31,20 +31,16 @@ def calculate_splits(config):
     #if the user does not specify an inputURI we will need to construct it from
     #the db/collection name TODO
 
-    uri = config.get("input_uri", "mongodb://localhost/test.in")
-    config['input_uri'] = uri
+    uri = config.setdefault("input_uri", "mongodb://localhost/test.in")
     uri_info = uri_parser.parse_uri(uri)
 
-    #database_name = uri_info['database']
-    collection_name = uri_info['collection']
-
     db = get_database(uri)
-    stats = db.command("collstats", collection_name)
+    stats = db.command("collstats", uri_info['collection'])
 
-    is_sharded = False if "sharded" not in stats else stats["sharded"]
-    use_shards = config.get("use_shards", False)
-    use_chunks = config.get("use_chunks", False)
-    slave_ok = config.get("slave_ok", False)
+    isSharded = stats.get('sharded', False)
+    useShards = config.get("use_shards", False)
+    useChunks = config.get("use_chunks", False)
+    slaveOk = config.get("slave_ok", False)
 
     if config.get("create_input_splits"):
         logging.info("Creation of Input Splits is enabled.")
