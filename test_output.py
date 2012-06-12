@@ -1,5 +1,4 @@
 from disco.core import Job, result_iterator
-from job import DiscoJob
 
 def map(line, params):
     for word in line.split():

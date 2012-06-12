@@ -31,6 +31,6 @@ def reduce(iter, params):
 
 
 if __name__ == '__main__':
-    from mongodisco.job import DiscoJob
-    DiscoJob(config=config, map=map, reduce=reduce).run()
+    from mongodisco.job import MongoJob
+    MongoJob().run(map=map, reduce=reduce, **config)
 

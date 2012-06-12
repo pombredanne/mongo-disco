@@ -18,74 +18,75 @@ Author: NYU ITP team
 Description: Disco Job Wrapper
 
 '''
-from disco.core import Job, result_iterator
-from disco.worker.classic.worker import Params
+from disco.job import Job
+from disco.core import classic_iterator
 from mongodisco.mongodb_io import mongodb_output_stream, mongodb_input_stream
-from splitter import calculate_splits as do_split
+from mongodisco.splitter import calculate_splits
+import logging
 
 
-class DiscoJob():
+class MongoJob(Job):
 
-    DEFAULT_CONFIG = {
-        "job_output_key" : "_id",
-        "job_output_value" : "value",
-        "input_uri" : "mongodb://localhost/test.in",
-        "output_uri" : "mongodb://localhost/test.out",
-        "print_to_stdout": False,
-        "job_wait":True,
-        "split_size" : 8,
-        "split_key" : {"_id" : 1},
-        "create_input_splits" : True,
-        "use_shards" : False,
-        "use_chunks" : True,
-        "slave_ok" : False,
-        "limit" : 0,
-        "skip" : 0,
-        "input_key" : None,
-        "sort" : None,
-        "timeout" : False,
-        "fields" : None,
-        "query" : {}
-    }
+    # DEFAULT_CONFIG = {
+    #     "job_output_key" : "_id",
+    #     "job_output_value" : "value",
+    #     # "input_uri" : "mongodb://localhost/test.in",
+    #     # "output_uri" : "mongodb://localhost/test.out",
+    #     "print_to_stdout": False,
+    #     "job_wait": True,
+    #     "split_size" : 8,
+    #     "split_key" : {"_id" : 1},
+    #     "create_input_splits" : True,
+    #     "splits_use_shards" : False,
+    #     "splits_use_chunks" : True,
+    #     "slave_ok" : False,
+    #     "limit" : 0,
+    #     "skip" : 0,
+    #     "inputKey" : None,
+    #     "sort" : None,
+    #     "timeout" : False,
+    #     "fields" : None,
+    #     "query" : {}
+    # }
 
-    def __init__(self,config,map,reduce):
-        self.config = DiscoJob.DEFAULT_CONFIG.copy()
-        self.config.update(config)
+    def run(self, map, reduce, **jobargs):
+        """Run a map-reduce job with either ``input_uri`` or ``output_uri``
+        as a "mongodb://..." URI.
 
-        self.map = map
-        self.reduce = reduce
-        self.job = Job()
-        self.params = Params(**self.config)
+        .. todo:
 
-    def run(self):
+            parameter docs
+            consider "input" and "output" (sans _uri)
+        """
 
-        if self.config['print_to_stdout']:
+        if not any(uri in jobargs for uri in ('input_uri', 'output_uri')):
+            logging.info('You did not specify "input_uri" or "output_uri" '
+                         'with MongoJob. This may be in error.')
 
-            self.job.run(input = do_split(self.config),
-                     map = self.map,
-                     reduce = self.reduce,
-                     params = self.params,
-                     map_input_stream = mongodb_input_stream,
-                     required_modules= ['mongodisco.mongodb_io',
-                                        'mongodisco.mongodb_input',
-                                        'mongodisco.mongo_util',
-                                        'mongodisco.mongodb_output'])
-            for key, value in result_iterator(self.job.wait(show=True)):
+        if 'mongodb://' in jobargs.get('input_uri', ''):
+            jobargs['map_input_stream'] = mongodb_input_stream
+
+        if 'mongodb://' in jobargs.get('output_uri', ''):
+            jobargs['reduce_output_stream'] = mongodb_output_stream
+
+        jobargs['map'] = map
+        jobargs['reduce'] = reduce
+        jobargs.setdefault('input', calculate_splits(jobargs))
+        jobargs.setdefault('required_modules', []).extend([
+            'mongodisco.mongodb_io',
+            'mongodisco.mongodb_input',
+            'mongodisco.mongodb_output',
+            'mongodisco.mongo_util',
+        ])
+
+        super(MongoJob, self).run(**jobargs)
+
+        if jobargs.get('print_to_stdout'):
+            for key, value in classic_iterator(self.wait(show=True)):
                 print key, value
 
-        else:
-            self.job.run(input = do_split(self.config),
-                     map = self.map,
-                     reduce = self.reduce,
-                     params = self.params,
-                     map_input_stream = mongodb_input_stream,
-                     reduce_output_stream = mongodb_output_stream,
-                     required_modules= ['mongodisco.mongodb_io',
-                                        'mongodisco.mongodb_input',
-                                        'mongodisco.mongo_util',
-                                        'mongodisco.mongodb_output'])
+        elif jobargs.get('job_wait',False):
+            self.wait(show=True)
 
-            if self.config.get("job_wait",False):
-                self.job.wait(show=True)
-
+        return self
 

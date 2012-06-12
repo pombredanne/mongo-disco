@@ -1,6 +1,5 @@
 from disco.util import kvgroup
 import unittest
-from Job import DiscoJob
 import mongodb_input
 
 '''

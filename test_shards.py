@@ -1,5 +1,5 @@
 import time
-from mongodisco.job import DiscoJob
+from mongodisco.job import MongoJob
 from disco.core import Job,result_iterator
 from mongodisco.mongodb_io import mongodb_output_stream,mongodb_input_stream
 from mongodisco.splitter import calculate_splits as do_split
@@ -53,7 +53,7 @@ def test_traditional_way():
 if __name__ == '__main__':
 
 
-    DiscoJob(config=config,map=map,reduce=reduce).run()
+    MongoJob().run(map=map, reduce=reduce, **config)
     #test_traditional_way();
     
 

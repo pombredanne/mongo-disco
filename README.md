@@ -76,12 +76,12 @@ def reduce(iter, params):
 
 The first parameter, iter, is an iterator over keys and values produced by the map function. We use disco.util.kvgroup() to simply pull out each word along with its counts, and sum them together.
 
-Setup 4. Create a DiscoJob instance and run it
+Setup 4. Create a MongoJob instance and run it
 
 ```python
-from mongodisco.job import DiscoJob
+from mongodisco.job import MongoJob
 
-DiscoJob(config = config,map = map,reduce = reduce).run()
+MongoJob().run(map=map, reduce=reduce, **config)
 ```
 
 Now you run it in a terminal like other python codes and check the result in MongoDB.
@@ -89,7 +89,7 @@ Now you run it in a terminal like other python codes and check the result in Mon
 
 ##Appendix
 
-Configuration for DiscoJob
+Configuration for MongoJob
 
 <table>
 <tr><td>Name</td><td>Default Value</td><td>Note</td></tr>

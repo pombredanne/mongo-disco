@@ -1,5 +1,4 @@
-from mongodisco.job import DiscoJob
-
+from mongodisco.job import MongoJob
 
 import logging
 
@@ -24,6 +23,6 @@ def reduce(iter, params):
 
 if __name__ == '__main__':
 
-    DiscoJob(config = config,map = map,reduce = reduce).run()
+    MongoJob().run(map=map, reduce=reduce, **config)
     
 
