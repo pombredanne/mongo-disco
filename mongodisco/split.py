@@ -62,8 +62,7 @@ class MongoInputSplit():
         queryObj['timeout'] = self.timeout
         queryObj['slave_ok'] = self.slave_ok
 
-        str = json.dumps(queryObj,default=json_util.default)
-        return str
+        return json.dumps(queryObj, default=json_util.default, separators=(',', ':'))
 
     def __str__(self):
         return self.format_uri_with_query()

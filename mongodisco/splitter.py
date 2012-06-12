@@ -46,12 +46,6 @@ def calculate_splits(config):
     use_chunks = config.get("use_chunks", False)
     slave_ok = config.get("slave_ok", False)
 
-    logging.info(" Calculate Splits Code ... Use Shards? - %s\nUse Chunks? \
-        - %s\nCollection Sharded? - %s" % (use_shards, use_chunks, is_sharded))
-
-    logging.info("WRAPP")
-    logging.info(config)
-    logging.info("WRAPP")
     if config.get("create_input_splits"):
         logging.info("Creation of Input Splits is enabled.")
         if is_sharded and (use_shards or use_chunks):
@@ -143,7 +137,6 @@ def _split(config=None, q={}, min=None, max=None):
     """ constructs a split object to be used later
     :returns: an actual MongoSplit object
     """
-    print "_split being created"
     query = bson.son.SON()
     query["$query"] = q
 
