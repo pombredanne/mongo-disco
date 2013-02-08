@@ -49,7 +49,7 @@ class MongoJob(Job):
     #     "query" : {}
     # }
 
-    def run(self, map, reduce, **jobargs):
+    def run(self, map=None, reduce=None, **jobargs):
         """Run a map-reduce job with either ``input_uri`` or ``output_uri``
         as a "mongodb://..." URI.
 
@@ -69,8 +69,10 @@ class MongoJob(Job):
         if 'mongodb://' in jobargs.get('output_uri', ''):
             jobargs['reduce_output_stream'] = mongodb_output_stream
 
-        jobargs['map'] = map
-        jobargs['reduce'] = reduce
+        if map:
+            jobargs['map'] = map
+        if reduce:
+            jobargs['reduce'] = reduce
         jobargs.setdefault('input', calculate_splits(jobargs))
         jobargs.setdefault('required_modules', []).extend([
             'mongodisco.mongodb_io',
