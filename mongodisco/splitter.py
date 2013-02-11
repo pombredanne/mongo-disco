@@ -37,10 +37,9 @@ def calculate_splits(config):
     db = get_database(uri)
     stats = db.command("collstats", uri_info['collection'])
 
-    isSharded = stats.get('sharded', False)
-    useShards = config.get("use_shards", False)
-    useChunks = config.get("use_chunks", False)
-    slaveOk = config.get("slave_ok", False)
+    is_sharded = stats.get('sharded', False)
+    use_shards = config.get("use_shards", False)
+    use_chunks = config.get("use_chunks", False)
 
     if config.get("create_input_splits"):
         logging.info("Creation of Input Splits is enabled.")
