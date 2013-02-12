@@ -21,6 +21,7 @@ Description: Disco Job Wrapper
 from disco.job import Job
 from disco.core import classic_iterator
 from mongodisco.mongodb_io import mongodb_output_stream, mongodb_input_stream
+from mongodisco.bsonfile_io import bsonfile_output_stream, bsonfile_input_stream
 from mongodisco.splitter import calculate_splits
 import logging
 
@@ -32,6 +33,8 @@ class MongoJob(Job):
     #     "job_output_value" : "value",
     #     # "input_uri" : "mongodb://localhost/test.in",
     #     # "output_uri" : "mongodb://localhost/test.out",
+    #     "bson_input" : False, # Format input is bson files (i.e. mongodump not mongodb)
+    #     "bson_output" : False, # Format output as bson files (i.e. mongodump not mongodb)
     #     "print_to_stdout": False,
     #     "job_wait": True,
     #     "split_size" : 8,
@@ -59,26 +62,36 @@ class MongoJob(Job):
             consider "input" and "output" (sans _uri)
         """
 
-        if not any(uri in jobargs for uri in ('input_uri', 'output_uri')):
+        if not any(uri in jobargs for uri in ('input_uri', 'output_uri', 'bson_input', 'bson_output')):
             logging.info('You did not specify "input_uri" or "output_uri" '
                          'with MongoJob. This may be in error.')
 
         if 'mongodb://' in jobargs.get('input_uri', ''):
             jobargs['map_input_stream'] = mongodb_input_stream
+        elif jobargs.get('bson_input', False):
+            jobargs['map_input_stream'] = bsonfile_input_stream
 
         if 'mongodb://' in jobargs.get('output_uri', ''):
             jobargs['reduce_output_stream'] = mongodb_output_stream
+        elif jobargs.get('bson_output', False):
+            jobargs['reduce_output_stream'] = bsonfile_output_stream
 
         if map:
             jobargs['map'] = map
         if reduce:
             jobargs['reduce'] = reduce
-        jobargs.setdefault('input', calculate_splits(jobargs))
+
+        if 'input' not in jobargs:
+            jobargs.setdefault('input', calculate_splits(jobargs))
+            
         jobargs.setdefault('required_modules', []).extend([
             'mongodisco.mongodb_io',
             'mongodisco.mongodb_input',
             'mongodisco.mongodb_output',
             'mongodisco.mongo_util',
+            'mongodisco.bsonfile_io',
+            'mongodisco.bsonfile_input',
+            'mongodisco.bsonfile_output'
         ])
 
         super(MongoJob, self).run(**jobargs)
