@@ -16,12 +16,6 @@ from mongodisco.mongodb_output import mongodb_output
 from mongodisco.mongodb_input import input_stream
 from disco.worker.classic.func import task_output_stream
 
+
+mongodb_output_stream = (task_output_stream,mongodb_output)
 mongodb_input_stream = (input_stream,)
-
-# Params is for the user. We have to pass output_uri using a closure.
-def mongodb_output_stream(uri):
-  def output_stream(stream, partition, url, params):
-    params['output_uri'] = uri
-    return mongodb_output(stream, partition, url, params)
-
-  return (task_output_stream, output_stream)

@@ -17,14 +17,15 @@ from mongodisco.mongo_util import get_connection,get_collection
 class MongoOutput(object):
     '''Output stream for mongoDB
     '''
-    def __init__(self, params):
+    def __init__(self, uri):
         print params.__dict__
 
         config = {}
         for key, value in params.__dict__.iteritems():
             config[key] = value
 
-        self.uri =  config.get('output_uri')
+        # self.uri =  config.get('output_uri')
+        self.uri = uri
         self.conn = get_connection(self.uri)
         self.coll = get_collection(self.uri)
         self.key_name = config.get('job_output_key','_id')
@@ -54,5 +55,5 @@ def mongodb_output(stream,partition,url,params):
     # Due to the way that Disco imports and uses this
     # function, we must re-import the module here.
     from mongodisco.mongodb_output import MongoOutput
-    return MongoOutput(stream,params)
+    return MongoOutput(stream)
 
