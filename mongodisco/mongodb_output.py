@@ -18,7 +18,7 @@ class MongoOutput(object):
     '''Output stream for mongoDB
     '''
     def __init__(self,stream,params):
-        print params
+        print params.__dict__
 
         config = {}
         for key, value in params.__dict__.iteritems():
