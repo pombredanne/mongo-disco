@@ -17,7 +17,7 @@ from mongodisco.mongo_util import get_connection,get_collection
 class MongoOutput(object):
     '''Output stream for mongoDB
     '''
-    def __init__(self,stream,params):
+    def __init__(self, params):
         print params.__dict__
 
         config = {}

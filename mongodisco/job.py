@@ -72,7 +72,7 @@ class MongoJob(Job):
             jobargs['map_input_stream'] = bsonfile_input_stream
 
         if 'mongodb://' in jobargs.get('output_uri', ''):
-            jobargs['reduce_output_stream'] = mongodb_output_stream
+            jobargs['reduce_output_stream'] = mongodb_output_stream(jobargs['output_uri'])
         elif jobargs.get('bson_output', False):
             jobargs['reduce_output_stream'] = bsonfile_output_stream
 
@@ -81,8 +81,10 @@ class MongoJob(Job):
         if reduce:
             jobargs['reduce'] = reduce
 
-        if 'input' not in jobargs:
+        if 'input_uri' in jobargs:
             jobargs.setdefault('input', calculate_splits(jobargs))
+
+
             
         jobargs.setdefault('required_modules', []).extend([
             'mongodisco.mongodb_io',
