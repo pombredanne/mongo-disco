@@ -18,10 +18,10 @@ from disco.worker.classic.func import task_output_stream
 
 mongodb_input_stream = (input_stream,)
 
-# Params object is deprecated. We have to pass output_uri in somehow.
+# Params is for the user. We have to pass output_uri using a closure.
 def mongodb_output_stream(uri):
   def output_stream(stream, partition, url, params):
     params['output_uri'] = uri
-    mongodb_output(stream, partition, url, params)
+    return mongodb_output(stream, partition, url, params)
 
   return (task_output_stream, output_stream)
