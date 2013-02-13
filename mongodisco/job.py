@@ -35,6 +35,8 @@ class MongoJob(Job):
     #     # "output_uri" : "mongodb://localhost/test.out",
     #     "bson_input" : False, # Format input is bson files (i.e. mongodump not mongodb)
     #     "bson_output" : False, # Format output as bson files (i.e. mongodump not mongodb)
+    #     "add_action" : "insert", # Action to use, insert/save
+    #     "add_upsert" : False, # Upsert/instead of update
     #     "print_to_stdout": False,
     #     "job_wait": True,
     #     "split_size" : 8,
@@ -74,7 +76,20 @@ class MongoJob(Job):
 
         if 'mongodb://' in jobargs.get('output_uri', ''):
             jobargs['reduce_output_stream'] = mongodb_output_stream
-            jobargs.setdefault('output', jobargs['output_uri'])
+            output_params = {
+                'output_uri': jobargs['output_uri'],
+                'job_output_key': jobargs.get('job_output_key', '_id'),
+                'job_output_value': jobargs.get('job_output_value', 'value'),
+                'add_action': jobargs.get('add_action', 'insert'),
+                'add_upsert': jobargs.get('add_upsert', False)
+            }
+
+            params = jobargs.get('params', {})
+            if not isinstance(params, dict):
+                raise Exception('params option must be a dict')
+            params['mongodb'] = output_params
+            jobargs['params'] = params
+            
         elif jobargs.get('bson_output', False):
             jobargs['reduce_output_stream'] = bsonfile_output_stream
 
