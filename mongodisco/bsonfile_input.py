@@ -25,11 +25,14 @@ from bson import decode_all
 class BsonInputStream(object):
     """Input stream of bson-formatted files"""
 
-    def __init__(self, stream):
-        self.docs = decode_all(stream.read())
+    def __init__(self, stream, params):
+        input_key = (params or {}).get('bson_input_key', '_id')
+        docs = decode_all(stream.read())
+        self.length = len(docs)
+        self.docs = ((obj.get(input_key, 'no_input_key'), obj) for obj in docs)
 
     def __len__(self):
-        return len(self.docs)
+        return self.length
 
     def __iter__(self):
         #most important method
@@ -44,4 +47,4 @@ def input_stream(stream, size, url, params):
     # Due to the way that Disco imports and uses this
     # function, we must re-import the module here.
     from mongodisco.bsonfile_input import BsonInputStream
-    return BsonInputStream(stream)
+    return BsonInputStream(stream, params)
