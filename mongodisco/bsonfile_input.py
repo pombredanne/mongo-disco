@@ -29,7 +29,7 @@ class BsonInputStream(object):
         input_key = (params or {}).get('bson_input_key', '_id')
         docs = decode_all(stream.read())
         self.length = len(docs)
-        self.docs = ((obj.get(input_key, 'no_input_key'), obj) for obj in docs)
+        self.docs = ((str(obj.get(input_key, 'no_input_key')), obj) for obj in docs)
 
     def __len__(self):
         return self.length
