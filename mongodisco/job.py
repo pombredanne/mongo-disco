@@ -37,6 +37,7 @@ class MongoJob(Job):
     #     "bson_output" : False, # Format output as bson files (i.e. mongodump not mongodb)
     #     "add_action" : "insert", # Action to use, insert/save
     #     "add_upsert" : False, # Upsert/instead of update
+    #     "base_doc": {}, # Base document to insert
     #     "print_to_stdout": False,
     #     "job_wait": True,
     #     "split_size" : 8,
@@ -81,7 +82,8 @@ class MongoJob(Job):
                 'job_output_key': jobargs.get('job_output_key', '_id'),
                 'job_output_value': jobargs.get('job_output_value', 'value'),
                 'add_action': jobargs.get('add_action', 'insert'),
-                'add_upsert': jobargs.get('add_upsert', False)
+                'add_upsert': jobargs.get('add_upsert', False),
+                'base_doc': jobargs.get('base_doc', {})
             }
 
             params = jobargs.get('params', {})
@@ -89,7 +91,7 @@ class MongoJob(Job):
                 raise Exception('params option must be a dict')
             params['mongodb'] = output_params
             jobargs['params'] = params
-            
+
         elif jobargs.get('bson_output', False):
             jobargs['reduce_output_stream'] = bsonfile_output_stream
 
@@ -99,8 +101,6 @@ class MongoJob(Job):
             jobargs['reduce'] = reduce
 
 
-
-            
         jobargs.setdefault('required_modules', []).extend([
             'mongodisco.mongodb_io',
             'mongodisco.mongodb_input',

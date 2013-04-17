@@ -12,6 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+from copy import deepcopy
 from mongodisco.mongo_util import get_connection,get_collection
 
 class MongoOutput(object):
@@ -30,10 +31,11 @@ class MongoOutput(object):
         self.value_name = config.get('job_output_value')
         self.add_action = config.get('add_action', 'insert')
         self.add_upsert = config.get('add_upsert', False)
+        self.base_doc = config.get('base_doc', {})
 
 
     def add(self,key,val):
-        result_dict = {}
+        result_dict = deepcopy(self.base_doc)
         result_dict[self.key_name] = key
         result_dict[self.value_name] = val
         if self.add_action == 'insert':
