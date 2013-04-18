@@ -43,8 +43,10 @@ class MongoOutput(object):
         elif self.add_action == 'save':
             self.coll.save(result_dict)
         elif self.add_action == 'update':
+            update_dict = deepcopy(self.base_doc)
+            update_dict[self.key_name] = key
             #In this case val needs to be an object containing commands like $set, $inc, $unset, etc
-            self.coll.update({self.key_name: key}, val, upsert=self.add_upsert)
+            self.coll.update(update_dict, result_dict, upsert=self.add_upsert)
 
     def close(self):
         self.conn.close()
