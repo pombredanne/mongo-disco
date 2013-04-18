@@ -111,7 +111,7 @@ class MongoJob(Job):
             'mongodisco.bsonfile_output'
         ])
 
-        MongoJob.run(self, **jobargs)
+        Job.run(self, **jobargs)
 
         if jobargs.get('print_to_stdout'):
             for key, value in classic_iterator(self.wait(show=True)):
