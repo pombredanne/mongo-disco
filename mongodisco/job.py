@@ -31,8 +31,9 @@ class MongoJob(Job):
     # DEFAULT_CONFIG = {
     #     "job_output_key" : "_id",
     #     "job_output_value" : "value",
-    #     # "input_uri" : "mongodb://localhost/test.in",
-    #     # "output_uri" : "mongodb://localhost/test.out",
+    #     "input_uri" : "mongodb://localhost/test.in",
+    #     "output_uri" : "mongodb://localhost/test.out",
+    #     "admin_uri" : "mongodb://localhost/admin", # Use for unsharded secured instances
     #     "bson_input" : False, # Format input is bson files (i.e. mongodump not mongodb)
     #     "bson_output" : False, # Format output as bson files (i.e. mongodump not mongodb)
     #     "add_action" : "insert", # Action to use, insert/save

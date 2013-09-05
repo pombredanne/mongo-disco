@@ -54,9 +54,10 @@ def calculate_splits(config):
         # perfectly ok for sharded setups to run with a normally calculated split.
         #May even be more efficient for some cases
         else:
+            adminuri = config.setdefault('admin_uri', 'mongodb://localhost/admin')
             logging.info("Using Unsharded Split mode \
                     (Calculating multiple splits though)")
-            return calculate_unsharded_splits(config, uri)
+            return calculate_unsharded_splits(config, uri, adminuri)
 
     else:
         logging.info("Creation of Input Splits is disabled;\
@@ -65,7 +66,7 @@ def calculate_splits(config):
         return calculate_single_split(config)
 
 
-def calculate_unsharded_splits(config, uri):
+def calculate_unsharded_splits(config, uri, adminuri):
     """@todo: Docstring for calculate_unsharded_splits
 
     :returns: @todo
@@ -77,6 +78,7 @@ def calculate_unsharded_splits(config, uri):
     logging.info("Calculating unsharded splits")
 
     coll = get_collection(uri)
+    admindb = get_database(adminuri)
 
     q = {} if not "query" in config else config.get("query")
 
@@ -105,7 +107,7 @@ def calculate_unsharded_splits(config, uri):
         cmd["max"] = split_max
 
     logging.debug("Issuing Command: %s" % cmd)
-    data = coll.database.command(cmd)
+    data = admindb.command(cmd)
     logging.debug("%r" % data)
 
     # results should look like this
